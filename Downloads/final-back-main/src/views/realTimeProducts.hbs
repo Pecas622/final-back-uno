@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Productos</title>
+    <link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+    <h1>Lista de Productos</h1>
+
+    <h2>Agregar Producto</h2>
+    <form id="addProductForm">
+        <input type="text" name="title" placeholder="Nombre del producto" required>
+        <input type="number" name="price" placeholder="Precio" required>
+        <input type="text" name="description" placeholder="Descripción" required>
+        <input type="number" name="stock" placeholder="Stock" required>
+        <input type="text" name="category" placeholder="Categoría" required>
+        <button type="submit">Agregar</button>
+    </form>
+
+    <h2>Eliminar Producto</h2>
+    <form id="deleteProductForm">
+        <input type="text" id="productId" name="id" placeholder="ID del producto" required>
+        <button type="submit">Eliminar</button>
+    </form>
+
+    <h2>Lista de productos</h2>
+    <ul id="productList">
+        {{#each products}} 
+            <li data-id="{{this._id}}">
+                <strong>Producto: </strong>{{this.title}} 
+                <strong>Precio: </strong>{{this.price}} 
+                <strong>Categoría: </strong>{{this.category}} 
+                <strong>Descripción: </strong>{{this.description}} 
+                <hr>
+            </li>
+        {{/each}}
+    </ul>
+
+    <script>
+        document.getElementById('addProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const formData = new FormData(this);
+            fetch('/api/products', {
+                method: 'POST',
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Producto agregado exitosamente');
+                    window.location.reload();
+                } else {
+                    alert('Error al agregar el producto');
+                }
+            });
+        });
+
+        document.getElementById('deleteProductForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const productId = document.getElementById('productId').value;
+            fetch(`/api/products/${productId}`, { method: 'DELETE' })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Producto eliminado');
+                    window.location.reload();
+                } else {
+                    alert('Error al eliminar producto');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

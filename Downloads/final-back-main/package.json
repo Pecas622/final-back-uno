@@ -1,0 +1,22 @@
+{
+  "name": "final-backend",
+  "version": "1.0.0",
+  "main": "src/app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-handlebars": "^8.0.1",
+    "mongoose": "^8.10.1",
+    "mongoose-paginate-v2": "^1.9.0",
+    "socket.io": "^4.8.1",
+    "socket.io-client": "^4.8.1"
+  },
+  "description": ""
+}
