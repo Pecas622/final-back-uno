@@ -1,21 +1,11 @@
-import mongoose, { Types } from 'mongoose'
+import mongoose from "mongoose";
 
-
-const ordersCollections = 'orders'
-
-const ordersSchema = new mongoose.Schema({
+const orderSchema = new mongoose.Schema({
     name: String,
-    size: {
-        type: String,
-        enum: ["small", "medium", "large"],
-        default: "medium" 
-    },
-    price: Number,
-    quantity: Number,
-    date: Date
-    
-})
+    size: String,
+    quantity: Number
+});
 
-export const ordersModel = mongoose.model(ordersCollections, ordersSchema)
+const ordersModel = mongoose.model("Order", orderSchema);
 
-// role 
+export default ordersModel;

@@ -8,7 +8,7 @@ const router = express.Router();
 // Ruta para crear un nuevo producto
 router.post('/', async (req, res) => {
     try {
-        const { title, price, stock, category } = req.body;
+        const { title, price, stock, category,  } = req.body; 
 
         if (!title || !price || !stock || !category) {
             return res.status(400).json({ message: 'Todos los campos son requeridos' });
@@ -18,7 +18,8 @@ router.post('/', async (req, res) => {
             title,
             price,
             stock,
-            category
+            category,
+
         });
 
         await newProduct.save();
@@ -29,7 +30,6 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: 'Error al crear el producto' });
     }
 });
-
 // Ruta para obtener todos los productos
 router.get('/', async (req, res) => {
     try {
@@ -52,6 +52,22 @@ router.get('/:id', async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error al obtener el producto' });
+    }
+});
+// Ruta para eliminar un producto por su ID
+router.delete('/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const product = await Product.findByIdAndDelete(id);
+
+        if (!product) {
+            return res.status(404).json({ message: 'Producto no encontrado' });
+        }
+
+        res.json({ message: 'Producto eliminado exitosamente' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error al eliminar el producto' });
     }
 });
 

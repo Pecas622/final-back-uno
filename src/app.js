@@ -9,7 +9,7 @@ const PORT = process.env.PORT || 8080;
 // 🔹 Conectar a MongoDB con manejo de errores
 connectDB().catch(error => {
     console.error("Error al conectar a la base de datos:", error);
-    process.exit(1); // Detener la app si la DB falla
+    process.exit(1);
 });
 
 // 🔹 Configuración de Handlebars
@@ -25,9 +25,16 @@ app.use(express.urlencoded({ extended: true }));
 // 🔹 Rutas principales
 app.use(routerApp);
 
-// 🔹 Ruta para RealTimeProducts
-app.get('/realtimeproducts', (req, res) => {
-    res.render('realTimeProducts');
+// 🔹 Ruta para productos en tiempo real SIN WebSockets
+app.get('/realtimeproducts', async (req, res) => {
+    try {
+        const response = await fetch('http://localhost:8080/api/products');
+        const products = await response.json();
+        res.render('realTimeProducts', { products });
+    } catch (error) {
+        console.error("Error al obtener productos:", error);
+        res.render('realTimeProducts', { products: [] });
+    }
 });
 
 // 🔹 Iniciar servidor

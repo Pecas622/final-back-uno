@@ -1,79 +1,88 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Productos</title>
-    <link rel="stylesheet" href="/css/styles.css">
-</head>
-<body>
-    <h1>Lista de Productos</h1>
+<h1>Bienvenido a la página de productos</h1>
 
-    <h2>Agregar Producto</h2>
-    <form id="addProductForm">
-        <input type="text" name="title" placeholder="Nombre del producto" required>
-        <input type="number" name="price" placeholder="Precio" required>
-        <input type="text" name="description" placeholder="Descripción" required>
-        <input type="number" name="stock" placeholder="Stock" required>
-        <input type="text" name="category" placeholder="Categoría" required>
-        <button type="submit">Agregar</button>
-    </form>
+<h2>Agregar Producto</h2>
+<form id="addProductForm">
+    <input type="text" name="title" placeholder="Nombre del producto" required>
+    <input type="number" name="price" placeholder="Precio" required>
+    <input type="text" name="description" placeholder="Descripción" required>
+    <input type="number" name="stock" placeholder="Stock" required>
+    <input type="text" name="category" placeholder="Categoría" required>
+    <button type="submit">Agregar</button>
+</form>
 
-    <h2>Eliminar Producto</h2>
-    <form id="deleteProductForm">
-        <input type="text" id="productId" name="id" placeholder="ID del producto" required>
-        <button type="submit">Eliminar</button>
-    </form>
+<h2>Lista de productos</h2>
+<ul id="productList">
+    {{#each products}}
+    <li data-id="{{this._id}}">
+        <strong>Producto: </strong>{{this.title}}
+        <strong>Precio: </strong>{{this.price}}
+        <strong>Categoría: </strong>{{this.category}}
+        <button class="deleteButton">Eliminar</button> <!-- Botón para eliminar -->
+        <hr>
+    </li>
+    {{/each}}
+</ul>
 
-    <h2>Lista de productos</h2>
-    <ul id="productList">
-        {{#each products}} 
-            <li data-id="{{this._id}}">
-                <strong>Producto: </strong>{{this.title}} 
-                <strong>Precio: </strong>{{this.price}} 
-                <strong>Categoría: </strong>{{this.category}} 
-                <strong>Descripción: </strong>{{this.description}} 
-                <hr>
-            </li>
-        {{/each}}
-    </ul>
+<script>
+    // Función para agregar un nuevo producto a la lista
+    document.getElementById('addProductForm').addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const formData = new FormData(event.target);
+        const productData = Object.fromEntries(formData.entries());
 
-    <script>
-        document.getElementById('addProductForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const formData = new FormData(this);
-            fetch('/api/products', {
-                method: 'POST',
-                body: JSON.stringify(Object.fromEntries(formData)),
-                headers: { 'Content-Type': 'application/json' }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Producto agregado exitosamente');
-                    window.location.reload();
-                } else {
-                    alert('Error al agregar el producto');
-                }
-            });
+        const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData)
         });
 
-        document.getElementById('deleteProductForm').addEventListener('submit', function(event) {
-            event.preventDefault();
+        const newProduct = await response.json();
 
-            const productId = document.getElementById('productId').value;
-            fetch(`/api/products/${productId}`, { method: 'DELETE' })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    alert('Producto eliminado');
-                    window.location.reload();
-                } else {
-                    alert('Error al eliminar producto');
-                }
-            });
-        });
-    </script>
-</body>
-</html>
+        if (response.ok) {
+            alert('Producto agregado exitosamente');
+            addProductToList(newProduct);
+        } else {
+            alert('Error al agregar el producto');
+        }
+
+        event.target.reset();
+    });
+
+    // Función para eliminar un producto de la lista
+    document.getElementById('productList').addEventListener('click', async (event) => {
+        if (event.target && event.target.classList.contains('deleteButton')) {
+            const productId = event.target.closest('li').getAttribute('data-id'); // Obtener el ID del producto
+            const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+
+            if (response.ok) {
+                alert('Producto eliminado exitosamente');
+                removeProductFromList(productId); // Eliminar el producto de la lista en el frontend
+            } else {
+                alert('Error al eliminar el producto');
+            }
+        }
+    });
+
+    // Función para agregar un producto a la lista en el frontend
+    function addProductToList(product) {
+        const productList = document.getElementById('productList');
+        const newProductItem = document.createElement('li');
+        newProductItem.setAttribute('data-id', product._id);
+        newProductItem.innerHTML = `
+            <strong>Producto: </strong>${product.title} 
+            <strong>Precio: </strong>${product.price} 
+            <strong>Categoría: </strong>${product.category}
+            <button class="deleteButton">Eliminar</button> <!-- Botón de eliminar -->
+            <hr>
+        `;
+        productList.appendChild(newProductItem);
+    }
+
+    // Función para eliminar un producto de la lista en el frontend
+    function removeProductFromList(productId) {
+        const productElement = document.querySelector(`[data-id="${productId}"]`);
+        if (productElement) {
+            productElement.remove();
+        }
+    }
+</script>
