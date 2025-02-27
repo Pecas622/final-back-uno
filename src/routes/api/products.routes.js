@@ -1,25 +1,22 @@
-// src/routes/products.routes.js
-
 import express from 'express';
-import Product from '../../models/products.models.js';
+import { ProductsModel } from "../../models/products.model.js";
 
 const router = express.Router();
 
 // Ruta para crear un nuevo producto
 router.post('/', async (req, res) => {
     try {
-        const { title, price, stock, category,  } = req.body; 
+        const { title, price, stock, category } = req.body;
 
         if (!title || !price || !stock || !category) {
             return res.status(400).json({ message: 'Todos los campos son requeridos' });
         }
 
-        const newProduct = new Product({
+        const newProduct = new ProductsModel({
             title,
             price,
             stock,
-            category,
-
+            category
         });
 
         await newProduct.save();
@@ -30,10 +27,12 @@ router.post('/', async (req, res) => {
         res.status(500).json({ message: 'Error al crear el producto' });
     }
 });
+
 // Ruta para obtener todos los productos
 router.get('/', async (req, res) => {
     try {
-        const products = await Product.find();
+        const products = await ProductsModel.find();
+        console.log(products); // Verifica los productos que estás enviando
         res.json(products);
     } catch (error) {
         console.error(error);
@@ -41,10 +40,11 @@ router.get('/', async (req, res) => {
     }
 });
 
+
 // Ruta para obtener un producto por su ID
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findById(req.params.id);
+        const product = await ProductsModel.findById(req.params.id);
         if (!product) {
             return res.status(404).json({ message: 'Producto no encontrado' });
         }
@@ -54,11 +54,12 @@ router.get('/:id', async (req, res) => {
         res.status(500).json({ message: 'Error al obtener el producto' });
     }
 });
+
 // Ruta para eliminar un producto por su ID
 router.delete('/:id', async (req, res) => {
     try {
         const { id } = req.params;
-        const product = await Product.findByIdAndDelete(id);
+        const product = await ProductsModel.findByIdAndDelete(id);
 
         if (!product) {
             return res.status(404).json({ message: 'Producto no encontrado' });

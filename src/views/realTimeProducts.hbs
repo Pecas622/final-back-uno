@@ -12,77 +12,78 @@
 
 <h2>Lista de productos</h2>
 <ul id="productList">
-    {{#each products}}
-    <li data-id="{{this._id}}">
-        <strong>Producto: </strong>{{this.title}}
-        <strong>Precio: </strong>{{this.price}}
-        <strong>Categoría: </strong>{{this.category}}
-        <button class="deleteButton">Eliminar</button> <!-- Botón para eliminar -->
-        <hr>
-    </li>
-    {{/each}}
+    <!-- Los productos se cargarán aquí dinámicamente -->
 </ul>
 
 <script>
-    // Función para agregar un nuevo producto a la lista
-    document.getElementById('addProductForm').addEventListener('submit', async (event) => {
-        event.preventDefault();
-        const formData = new FormData(event.target);
-        const productData = Object.fromEntries(formData.entries());
+// Función para obtener la lista de productos desde el backend
+document.addEventListener('DOMContentLoaded', async () => {
+    const response = await fetch('/api/products');
+    const products = await response.json();
+    
+    products.forEach(product => {
+        addProductToList(product); // Agregar cada producto a la lista
+    });
+});
 
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
-        });
+// Función para agregar un nuevo producto a la lista
+document.getElementById('addProductForm').addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const formData = new FormData(event.target);
+    const productData = Object.fromEntries(formData.entries());
 
-        const newProduct = await response.json();
+    const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(productData)
+    });
+
+    const newProduct = await response.json();
+
+    if (response.ok) {
+        alert('Producto agregado exitosamente');
+        addProductToList(newProduct);
+    } else {
+        alert('Error al agregar el producto');
+    }
+
+    event.target.reset();
+});
+
+// Función para eliminar un producto de la lista
+document.getElementById('productList').addEventListener('click', async (event) => {
+    if (event.target && event.target.classList.contains('deleteButton')) {
+        const productId = event.target.closest('li').getAttribute('data-id'); // Obtener el ID del producto
+        const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
 
         if (response.ok) {
-            alert('Producto agregado exitosamente');
-            addProductToList(newProduct);
+            alert('Producto eliminado exitosamente');
+            removeProductFromList(productId); // Eliminar el producto de la lista en el frontend
         } else {
-            alert('Error al agregar el producto');
-        }
-
-        event.target.reset();
-    });
-
-    // Función para eliminar un producto de la lista
-    document.getElementById('productList').addEventListener('click', async (event) => {
-        if (event.target && event.target.classList.contains('deleteButton')) {
-            const productId = event.target.closest('li').getAttribute('data-id'); // Obtener el ID del producto
-            const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
-
-            if (response.ok) {
-                alert('Producto eliminado exitosamente');
-                removeProductFromList(productId); // Eliminar el producto de la lista en el frontend
-            } else {
-                alert('Error al eliminar el producto');
-            }
-        }
-    });
-
-    // Función para agregar un producto a la lista en el frontend
-    function addProductToList(product) {
-        const productList = document.getElementById('productList');
-        const newProductItem = document.createElement('li');
-        newProductItem.setAttribute('data-id', product._id);
-        newProductItem.innerHTML = `
-            <strong>Producto: </strong>${product.title} 
-            <strong>Precio: </strong>${product.price} 
-            <strong>Categoría: </strong>${product.category}
-            <button class="deleteButton">Eliminar</button> <!-- Botón de eliminar -->
-            <hr>
-        `;
-        productList.appendChild(newProductItem);
-    }
-
-    // Función para eliminar un producto de la lista en el frontend
-    function removeProductFromList(productId) {
-        const productElement = document.querySelector(`[data-id="${productId}"]`);
-        if (productElement) {
-            productElement.remove();
+            alert('Error al eliminar el producto');
         }
     }
+});
+
+// Función para agregar un producto a la lista en el frontend
+function addProductToList(product) {
+    const productList = document.getElementById('productList');
+    const newProductItem = document.createElement('li');
+    newProductItem.setAttribute('data-id', product._id);
+    newProductItem.innerHTML = `
+        <strong>Producto: </strong>${product.name}  <!-- Cambié title a name -->
+        <strong>Precio: </strong>${product.price}  
+        <button class="deleteButton">Eliminar</button>
+        <hr>
+    `;
+    productList.appendChild(newProductItem);
+}
+
+// Función para eliminar un producto de la lista en el frontend
+function removeProductFromList(productId) {
+    const productElement = document.querySelector(`[data-id="${productId}"]`);
+    if (productElement) {
+        productElement.remove();
+    }
+}
 </script>
