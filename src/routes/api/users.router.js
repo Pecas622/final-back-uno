@@ -31,21 +31,32 @@ router.get('/', async (req, res) => {
 });
 
 // Crear un nuevo usuario
-router.post('/', async (req, res) => {
+router.post('/api/products', async (req, res) => {
     try {
-        const { first_name, last_name, email } = req.body;
+        console.log('➡️ Recibiendo datos del frontend:', req.body);
 
-        // Validaciones básicas
-        if (!first_name || !last_name || !email) {
-            return res.status(400).json({ status: 'error', message: 'Todos los campos son obligatorios' });
+        const { title, price, description, stock, category } = req.body;
+
+        // Validación de datos
+        if (!title || !price || !description || !stock || !category) {
+            return res.status(400).json({ message: "Todos los campos son obligatorios" });
         }
 
-        const newUser = await modelUser.create({ first_name, last_name, email });
+        // Crear nuevo producto
+        const newProduct = new ProductsModel({
+            title,
+            price,
+            description,
+            stock,
+            category
+        });
 
-        res.status(201).json({ status: 'success', data: newUser });
+        await newProduct.save();
+        res.status(201).json(newProduct);
+
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ status: 'error', message: 'Error al crear el usuario' });
+        console.error('❌ Error en el servidor:', error);
+        res.status(500).json({ message: 'Error interno del servidor' });
     }
 });
 

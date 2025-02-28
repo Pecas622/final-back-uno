@@ -1,25 +1,42 @@
-<h1>Listado de usuarios</h1>
-<div>
-    <ul>
-        {{#each users}}
-            <li>
-                <strong>Nombre: </strong>{{this.first_name}}
-                <strong>Apellido: </strong>{{this.last_name}}
-                <strong>Email: </strong>{{this.email}}
-            </li>
-            <hr>
-        {{/each}}
-    </ul>
+<h1>Listado de productos</h1>
+<div id="productList">
+    <!-- Los productos se cargarán aquí -->
 </div>
 
 <div>
     <center>
-        {{#if hasPrevPage}}
-            <a href="/users?numPage={{prevPage}}">Anterior</a>
-        {{/if}}
-        <label>Página {{page}}</label>
-        {{#if hasNextPage}}
-            <a href="/users?numPage={{nextPage}}">Siguiente</a>
-        {{/if}}
+        <!-- Aquí iría la lógica de paginación si la tienes -->
     </center>
 </div>
+
+<script>
+// Esta es la parte del script donde haces la consulta fetch y actualizas el DOM
+const url = `/api/products?category=Accesorios&price=asc`;  // La URL con los parámetros de consulta
+
+fetch(url)
+    .then(response => response.json())
+    .then(data => {
+        const productList = document.getElementById('productList');
+        if (data && data.length > 0) {
+            let productHTML = '<ul>';
+            data.forEach(product => {
+                productHTML += `
+                    <li>
+                        <strong>Nombre: </strong>${product.title}
+                        <strong>Precio: </strong>$${product.price}
+                        <strong>Categoría: </strong>${product.category}
+                    </li>
+                    <hr>
+                `;
+            });
+            productHTML += '</ul>';
+            productList.innerHTML = productHTML;
+        } else {
+            productList.innerHTML = '<p>No se encontraron productos.</p>';
+        }
+    })
+    .catch(error => {
+        console.error('Error al obtener productos:', error);
+        document.getElementById('productList').innerHTML = '<p>Error al cargar los productos.</p>';
+    });
+</script>

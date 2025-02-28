@@ -1,5 +1,21 @@
 <h1>Bienvenido a la página de productos</h1>
 
+<h2>Filtrar productos</h2>
+<form id="filterForm">
+    <select name="category">
+        <option value="">Filtrar por categoría</option>
+        <option value="Accesorios">Accesorios</option>
+        <option value="Mates">Mates</option>
+        <option value="Yerbas">Yerbas</option>
+    </select>
+    <select name="price">
+        <option value="">Ordenar por precio</option>
+        <option value="asc">Precio Ascendente</option>
+        <option value="desc">Precio Descendente</option>
+    </select>
+    <button type="submit">Filtrar</button>
+</form>
+
 <h2>Agregar Producto</h2>
 <form id="addProductForm">
     <input type="text" name="title" placeholder="Nombre del producto" required>
@@ -15,52 +31,90 @@
     <!-- Los productos se cargarán aquí dinámicamente -->
 </ul>
 
+<div>
+    <center>
+        <button id="prevPageBtn" style="display: none;">Anterior</button>
+        <label id="pageLabel">Página 1</label>
+        <button id="nextPageBtn" style="display: none;">Siguiente</button>
+    </center>
+</div>
+
 <script>
 // Función para obtener la lista de productos desde el backend
-document.addEventListener('DOMContentLoaded', async () => {
-    const response = await fetch('/api/products');
-    const products = await response.json();
-    
-    products.forEach(product => {
-        addProductToList(product); // Agregar cada producto a la lista
-    });
-});
+async function fetchProducts(filters = {}) {
+    try {
+        const queryParams = new URLSearchParams(filters).toString();
+        const response = await fetch(`/api/products?${queryParams}`);
+        if (!response.ok) throw new Error('Error al obtener productos');
+        
+        const data = await response.json();
+        const products = data.products || [];
+        const productList = document.getElementById('productList');
+        productList.innerHTML = '';  // Limpiar la lista de productos antes de agregar los nuevos
 
-// Función para agregar un nuevo producto a la lista
+        products.forEach(product => addProductToList(product));
+
+        // Actualizar la paginación
+        document.getElementById('pageLabel').innerText = `Página ${data.page}`;
+        document.getElementById('prevPageBtn').style.display = data.hasPrevPage ? 'inline' : 'none';
+        document.getElementById('nextPageBtn').style.display = data.hasNextPage ? 'inline' : 'none';
+
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ No se pudieron cargar los productos');
+    }
+}
+
+// Función para agregar un nuevo producto
 document.getElementById('addProductForm').addEventListener('submit', async (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
     const productData = Object.fromEntries(formData.entries());
 
-    const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(productData)
-    });
+    // Convertir price y stock a números
+    productData.price = parseFloat(productData.price);
+    productData.stock = parseInt(productData.stock);
 
-    const newProduct = await response.json();
+    try {
+        const response = await fetch('/api/products', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(productData)
+        });
 
-    if (response.ok) {
-        alert('Producto agregado exitosamente');
-        addProductToList(newProduct);
-    } else {
-        alert('Error al agregar el producto');
+        const responseData = await response.json();
+
+        if (response.ok) {
+            alert('✅ Producto agregado exitosamente');
+            addProductToList(responseData);
+        } else {
+            alert(`❌ Error al agregar el producto: ${responseData.message}`);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('❌ Hubo un problema al enviar el producto');
     }
 
     event.target.reset();
 });
 
-// Función para eliminar un producto de la lista
+// Función para eliminar un producto
 document.getElementById('productList').addEventListener('click', async (event) => {
     if (event.target && event.target.classList.contains('deleteButton')) {
-        const productId = event.target.closest('li').getAttribute('data-id'); // Obtener el ID del producto
-        const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+        const productId = event.target.closest('li').getAttribute('data-id');
 
-        if (response.ok) {
-            alert('Producto eliminado exitosamente');
-            removeProductFromList(productId); // Eliminar el producto de la lista en el frontend
-        } else {
-            alert('Error al eliminar el producto');
+        try {
+            const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
+
+            if (response.ok) {
+                alert('✅ Producto eliminado exitosamente');
+                removeProductFromList(productId);
+            } else {
+                alert('❌ Error al eliminar el producto');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('❌ No se pudo eliminar el producto');
         }
     }
 });
@@ -70,9 +124,9 @@ function addProductToList(product) {
     const productList = document.getElementById('productList');
     const newProductItem = document.createElement('li');
     newProductItem.setAttribute('data-id', product._id);
-    newProductItem.innerHTML = `
-        <strong>Producto: </strong>${product.name}  <!-- Cambié title a name -->
-        <strong>Precio: </strong>${product.price}  
+    newProductItem.innerHTML = `    
+        <strong>Producto: </strong>${product.title}  
+        <strong>Precio: </strong>$${product.price}  
         <button class="deleteButton">Eliminar</button>
         <hr>
     `;
@@ -86,4 +140,36 @@ function removeProductFromList(productId) {
         productElement.remove();
     }
 }
+
+// Función para manejar el filtro de productos
+document.getElementById('filterForm').addEventListener('submit', (event) => {
+    event.preventDefault();
+
+    // Obtener los valores del formulario de filtrado
+    const formData = new FormData(event.target);
+    const filters = Object.fromEntries(formData.entries());
+
+    // Llamar a la función fetchProducts con los filtros aplicados
+    fetchProducts(filters);
+});
+
+// Función para manejar la paginación
+document.getElementById('prevPageBtn').addEventListener('click', () => {
+    // Redirigir a la página anterior (ajustando parámetros de paginación)
+    const currentPage = parseInt(document.getElementById('pageLabel').innerText.replace('Página ', ''));
+    if (currentPage > 1) {
+        fetchProducts({ page: currentPage - 1 });
+    }
+});
+
+document.getElementById('nextPageBtn').addEventListener('click', () => {
+    // Redirigir a la página siguiente (ajustando parámetros de paginación)
+    const currentPage = parseInt(document.getElementById('pageLabel').innerText.replace('Página ', ''));
+    fetchProducts({ page: currentPage + 1 });
+});
+
+// Cargar los productos inicialmente (sin filtros)
+document.addEventListener('DOMContentLoaded', () => {
+    fetchProducts();
+});
 </script>

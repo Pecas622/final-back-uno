@@ -13,7 +13,17 @@ connectDB().catch(error => {
 });
 
 // 🔹 Configuración de Handlebars
-app.engine('hbs', handlebars.engine({ extname: '.hbs' }));
+const hbs = handlebars.create({
+    extname: '.hbs',
+    helpers: {
+        // Helper eq para comparar valores
+        eq: function(a, b) {
+            return a === b;
+        }
+    }
+});
+
+app.engine('hbs', hbs.engine);
 app.set('views', './src/views');
 app.set('view engine', 'hbs');
 
