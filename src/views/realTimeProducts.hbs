@@ -1,19 +1,13 @@
 <h1>Bienvenido a la página de productos</h1>
 
-<h2>Filtrar productos</h2>
+<h2>Ordenar productos</h2>
 <form id="filterForm">
-    <select name="category">
-        <option value="">Filtrar por categoría</option>
-        <option value="Accesorios">Accesorios</option>
-        <option value="Mates">Mates</option>
-        <option value="Yerbas">Yerbas</option>
-    </select>
     <select name="price">
         <option value="">Ordenar por precio</option>
         <option value="asc">Precio Ascendente</option>
         <option value="desc">Precio Descendente</option>
     </select>
-    <button type="submit">Filtrar</button>
+    <button type="submit">Ordenar</button>
 </form>
 
 <h2>Agregar Producto</h2>
@@ -50,11 +44,10 @@ async function fetchProducts(filters = {}) {
         const data = await response.json();
         const products = data.products || [];
         const productList = document.getElementById('productList');
-        productList.innerHTML = '';  // Limpiar la lista de productos antes de agregar los nuevos
+        productList.innerHTML = '';  
 
         products.forEach(product => addProductToList(product));
 
-        // Actualizar la paginación
         document.getElementById('pageLabel').innerText = `Página ${data.page}`;
         document.getElementById('prevPageBtn').style.display = data.hasPrevPage ? 'inline' : 'none';
         document.getElementById('nextPageBtn').style.display = data.hasNextPage ? 'inline' : 'none';
@@ -71,7 +64,6 @@ document.getElementById('addProductForm').addEventListener('submit', async (even
     const formData = new FormData(event.target);
     const productData = Object.fromEntries(formData.entries());
 
-    // Convertir price y stock a números
     productData.price = parseFloat(productData.price);
     productData.stock = parseInt(productData.stock);
 
@@ -119,7 +111,6 @@ document.getElementById('productList').addEventListener('click', async (event) =
     }
 });
 
-// Función para agregar un producto a la lista en el frontend
 function addProductToList(product) {
     const productList = document.getElementById('productList');
     const newProductItem = document.createElement('li');
@@ -141,21 +132,16 @@ function removeProductFromList(productId) {
     }
 }
 
-// Función para manejar el filtro de productos
+// Función para manejar el ordenamiento de productos
 document.getElementById('filterForm').addEventListener('submit', (event) => {
     event.preventDefault();
-
-    // Obtener los valores del formulario de filtrado
     const formData = new FormData(event.target);
     const filters = Object.fromEntries(formData.entries());
-
-    // Llamar a la función fetchProducts con los filtros aplicados
     fetchProducts(filters);
 });
 
 // Función para manejar la paginación
 document.getElementById('prevPageBtn').addEventListener('click', () => {
-    // Redirigir a la página anterior (ajustando parámetros de paginación)
     const currentPage = parseInt(document.getElementById('pageLabel').innerText.replace('Página ', ''));
     if (currentPage > 1) {
         fetchProducts({ page: currentPage - 1 });
@@ -163,12 +149,11 @@ document.getElementById('prevPageBtn').addEventListener('click', () => {
 });
 
 document.getElementById('nextPageBtn').addEventListener('click', () => {
-    // Redirigir a la página siguiente (ajustando parámetros de paginación)
     const currentPage = parseInt(document.getElementById('pageLabel').innerText.replace('Página ', ''));
     fetchProducts({ page: currentPage + 1 });
 });
 
-// Cargar los productos inicialmente (sin filtros)
+// Cargar los productos inicialmente
 document.addEventListener('DOMContentLoaded', () => {
     fetchProducts();
 });
