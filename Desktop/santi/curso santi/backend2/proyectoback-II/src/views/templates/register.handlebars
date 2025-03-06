@@ -1,0 +1,31 @@
+<div class="container d-flex justify-content-center align-items-center min-vh-100">
+    <div class="card shadow-sm p-4 border-0 rounded-3" style="max-width: 450px; background-color: #f8f9fa;">
+        <h2 class="text-center mb-4 text-dark">Registro de Cuenta</h2>
+        <form id="registerForm" method="post">
+            <div class="mb-3">
+                <label for="first_name" class="form-label text-muted">Nombre</label>
+                <input type="text" class="form-control" name="first_name" required placeholder="Ingresa tu nombre completo">
+            </div>
+            <div class="mb-3">
+                <label for="last_name" class="form-label text-muted">Apellido</label>
+                <input type="text" class="form-control" name="last_name" required placeholder="Ingresa tu apellido completo">
+            </div>
+            <div class="mb-3">
+                <label for="age" class="form-label text-muted">Edad</label>
+                <input type="number" class="form-control" name="age" required placeholder="Tu edad" min="18" max="120">
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label text-muted">Correo Electrónico</label>
+                <input type="email" class="form-control" name="email" required placeholder="Tu correo electrónico">
+            </div>
+            <div class="mb-4">
+                <label for="password" class="form-label text-muted">Contraseña</label>
+                <input type="password" class="form-control" name="password" required placeholder="Elige una contraseña segura">
+            </div>
+            <button type="submit" class="btn btn-info w-100 mb-3">Crear Cuenta</button>
+            <div class="text-center">
+                <p class="mb-0">¿Ya tienes cuenta? <a href="/api/sessions/viewlogin" class="text-decoration-none text-info">Inicia sesión aquí</a></p>
+            </div>
+        </form>
+    </div>
+</div>
