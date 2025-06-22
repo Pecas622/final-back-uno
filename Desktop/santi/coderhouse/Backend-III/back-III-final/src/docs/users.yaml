@@ -1,0 +1,36 @@
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        name:
+          type: string
+          description: Nombre del usuario
+        date:
+          type: string
+          format: date
+          description: Fecha de nacimiento del usuario
+        email:
+          type: string
+          format: email
+          description: Correo electrónico del usuario
+        password:
+          type: string
+          description: Contraseña para iniciar sesión del usuario
+        avatar:
+          type: string
+          description: URL de la foto de perfil del usuario
+        role:
+          type: string
+          enum: [USER, ADMIN, PREM]
+          description: Rol del usuario en el sistema
+      example:
+        name: Santiago Zorrilla
+        date: 1998-04-20
+        email: santiago@pecas.com
+        password: claveSegura123
+        avatar: https://cdn-icons-png.flaticon.com/512/147/147142.png
+        role: USER

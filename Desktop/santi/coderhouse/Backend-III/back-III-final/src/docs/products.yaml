@@ -1,0 +1,125 @@
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        title:
+          description: Nombre del producto a comercializar
+          type: string
+        description:
+          description: Breve descripción física del producto
+          type: string
+        category:
+          description: Rubro al que pertenece el producto
+          type: string
+        image:
+          description: Imagen representativa del producto (URL)
+          type: string
+        price:
+          description: Cantidad de solares a pagar por el producto
+          type: number
+        stock:
+          description: Unidades disponibles del producto para vender
+          type: number
+        onsale:
+          description: Descripción de un producto en oferta
+          type: boolean
+        owner_id:
+          description: Identificación del dueño del producto (o empresa)
+          type: string
+      example:
+        title: Producto 1
+        description: Descripción del producto 1
+        category: Categoria del producto 1
+        image: URL del producto 1
+        price: 100
+        stock: 100
+        onsale: true
+        owner_id: 681a1e943e01c91f7b392613
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: token
+paths:
+  /api/products:
+    post:
+      summary: Crear un producto y agregarlo a la base de datos
+      tags:
+        - Product
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      security:
+        - cookieAuth: []
+    get:
+      summary: Ver los datos de varios productos de la base de datos (puede incluir un filtro)
+      tags:
+        - Product
+  /api/products/{id}:
+    get:
+      summary: Ver los datos de un producto de la base de datos
+      tags:
+        - Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+    put:
+      summary: Actualizar un producto de la base de datos
+      tags:
+        - Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  description: Nombre del producto a comercializar
+                  type: string
+                category:
+                  description: Rubro al que pertenece el producto
+                  type: string
+                image:
+                  description: Imagen representativa del producto (URL)
+                  type: string
+                stock:
+                  description: Unidades disponibles del producto para vender
+                  type: number
+                onsale:
+                  description: Descripción de un producto en oferta
+                  type: boolean
+              example:
+                title: Producto 1
+                category: Categoria del producto 1
+                image: URL del producto 1
+                stock: 100
+                onsale: true
+      security:
+        - cookieAuth: []
+    delete:
+      summary: Eliminar un producto de la base de datos
+      tags:
+        - Product
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      security:
+        - cookieAuth: []
+    
