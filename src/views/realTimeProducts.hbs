@@ -130,12 +130,15 @@
         });
 
         function addProductToList(product) {
+            console.log(product); // Verifica las propiedades reales
+
             const productList = document.getElementById('productList');
             const newProductItem = document.createElement('li');
             newProductItem.setAttribute('data-id', product._id);
+
             newProductItem.innerHTML = `
-                <strong>Producto: </strong>${product.title}
-                <strong> Precio: </strong>$${product.price}
+                <strong>Producto: </strong>${product.title || product.nombre || product.name || 'Sin nombre'}
+                <strong> Precio: </strong>$${product.price || product.precio || product.cost || '0'}
                 <button class="deleteButton">Eliminar</button>
                 <hr>
             `;
