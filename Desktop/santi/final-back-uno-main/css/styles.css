@@ -1,0 +1,143 @@
+/* Estilos generales */
+body {
+    font-family: 'Georgia', serif;
+    background-color: #fdf6e3;
+    /* crema envejecido */
+    color: #3e2c1c;
+    /* marrón oscuro */
+    margin: 0;
+    padding: 0;
+}
+
+/* Contenedor principal */
+.container {
+    max-width: 900px;
+    margin: 50px auto;
+    padding: 30px;
+    background-color: #fffdf6;
+    border: 2px solid #d6b37f;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(100, 75, 50, 0.1);
+    text-align: center;
+}
+
+/* Título principal */
+h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #5a3d2b;
+}
+
+/* Enlace a productos en tiempo real */
+a {
+    display: inline-block;
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #a67c52;
+    /* marrón más claro */
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+
+a:hover {
+    background-color: #8b5e3c;
+}
+
+h1,
+h2 {
+    color: #5a3d2b;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+form {
+    background-color: #fffaf3;
+    padding: 15px;
+    margin: 20px auto;
+    border: 1px solid #d6b37f;
+    border-radius: 8px;
+    max-width: 500px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+}
+
+form input,
+form select,
+form button {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    margin: 10px 0;
+    font-size: 1rem;
+    border: 1px solid #c0a980;
+    border-radius: 6px;
+}
+
+form button {
+    background-color: #a67c52;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+form button:hover {
+    background-color: #8b5e3c;
+}
+
+#productList {
+    list-style: none;
+    padding: 0;
+    max-width: 700px;
+    margin: auto;
+}
+
+#productList li {
+    background-color: #fffaf3;
+    margin: 10px 0;
+    padding: 12px;
+    border: 1px solid #e3c8a0;
+    border-radius: 6px;
+    box-shadow: 0 2px 5px rgba(70, 50, 20, 0.05);
+    position: relative;
+}
+
+.deleteButton {
+    background-color: #c0392b;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    float: right;
+    font-size: 0.9rem;
+}
+
+.deleteButton:hover {
+    background-color: #a93226;
+}
+
+#pageLabel {
+    font-size: 1.1rem;
+    margin: 10px;
+    color: #5a3d2b;
+}
+
+#prevPageBtn,
+#nextPageBtn {
+    background-color: #6f4e37;
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    margin: 5px;
+}
+
+#prevPageBtn:hover,
+#nextPageBtn:hover {
+    background-color: #543622;
+}

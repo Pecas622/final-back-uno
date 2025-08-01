@@ -1,0 +1,29 @@
+### Obtener todos los usuarios
+GET http://localhost:8080/api/users
+
+### Crear un nuevo usuario
+POST http://localhost:8080/api/users
+Content-Type: application/json
+
+{
+    "first_name": "santi",
+    "last_name": "santi",
+    "email": "santi@gmail.com"
+}
+
+### Obtener un usuario por ID 
+GET http://localhost:8080/api/users/67b73ab3207cafde4ef8a02b
+
+
+### Actualizar un usuario 
+PUT http://localhost:8080/api/users/67b73ab3207cafde4ef8a02b
+Content-Type: application/json
+
+{
+    "first_name": "santi",
+    "last_name": "santi",
+    "email": "santi@gmail.com"
+}
+
+### Eliminar un usuario 
+DELETE http://localhost:8080/api/users/67bde125111331aa0ba848c1
