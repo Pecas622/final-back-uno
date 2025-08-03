@@ -1,8 +1,10 @@
 import express from 'express';
 import handlebars from 'express-handlebars';
 import routerApp from './routes/index.js';
+import viewsRouter from '../src/routes/views.router.js      ';
 import { connectDB } from './config/index.js';
 import 'dotenv/config';
+
 const app = express();
 const PORT = process.env.PORT || 8080;
 
@@ -16,9 +18,13 @@ connectDB().catch(error => {
 const hbs = handlebars.create({
     extname: '.hbs',
     helpers: {
-        // Helper eq para comparar valores
-        eq: function(a, b) {
-            return a === b;
+        eq: (a, b) => a === b,
+        sumTotal: (products) => {
+            let total = 0;
+            for (const item of products) {
+                total += item.product.price * item.quantity;
+            }
+            return total.toFixed(2);
         }
     }
 });
@@ -32,8 +38,11 @@ app.use(express.static('src/public'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// 🔹 Rutas principales
-app.use(routerApp);
+// 🔹 Rutas principales (API REST)
+app.use(routerApp);      // rutas API (ej: /api/products, /api/carts...)
+
+// 🔹 Rutas para vistas (páginas renderizadas)
+app.use('/', viewsRouter); // rutas para vistas con render
 
 // 🔹 Ruta para productos en tiempo real SIN WebSockets
 app.get('/realtimeproducts', async (req, res) => {

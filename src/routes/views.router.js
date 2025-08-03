@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { productModel } from '../models/products.model.js'
+import { cartsModel } from '../models/carts.models.js'
 
 const router = Router()
 
@@ -7,6 +8,26 @@ const router = Router()
 router.use((req, res, next) => {
     res.locals.cartId = req.session?.cartId || null
     next()
+})
+
+// Ruta para mostrar la vista del carrito con productos poblados
+router.get('/cart/:id', async (req, res) => {
+  try {
+    const cart = await cartsModel.findById(req.params.id).populate('products.product').lean();
+    if (!cart) return res.status(404).render('error', { message: 'Carrito no encontrado' });
+
+    const total = cart.products.reduce((acc, item) => {
+      if (item.product) {
+        return acc + item.product.price * item.quantity;
+      }
+      return acc;
+    }, 0);
+
+    res.render('carts', { cart, total });
+  } catch (error) {
+    console.error('Error en /cart/:id:', error);
+    res.status(500).render('error', { message: 'Error interno del servidor' });
+  }
 })
 
 // Vista paginada de productos

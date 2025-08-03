@@ -117,8 +117,8 @@
 
                     if (response.ok) {
                         alert('✅ Producto eliminado exitosamente');
-                        // Recargar productos con filtros actuales y página actual
-                        fetchProducts();
+                        // Opcional: eliminar el elemento del DOM sin recargar toda la lista
+                        event.target.closest('li').remove();
                     } else {
                         alert('❌ Error al eliminar el producto');
                     }

@@ -53,6 +53,17 @@ router.post('/', async (req, res) => {
 router.post('/:id/products', async (req, res) => {
     try {
         const { productId, quantity } = req.body;
+
+        // Validar productId
+        if (!productId || typeof productId !== 'string') {
+            return res.status(400).json({ success: false, message: 'productId es obligatorio y debe ser string' });
+        }
+        // Validar quantity
+        const qty = parseInt(quantity);
+        if (isNaN(qty) || qty <= 0) {
+            return res.status(400).json({ success: false, message: 'quantity debe ser un número entero positivo' });
+        }
+
         const cart = await cartsModel.findById(req.params.id);
         if (!cart) {
             return res.status(404).json({ success: false, message: 'Carrito no encontrado' });
@@ -60,9 +71,9 @@ router.post('/:id/products', async (req, res) => {
 
         const existingProduct = cart.products.find(p => p.product.toString() === productId);
         if (existingProduct) {
-            existingProduct.quantity += quantity;
+            existingProduct.quantity += qty;
         } else {
-            cart.products.push({ product: productId, quantity });
+            cart.products.push({ product: productId, quantity: qty });
         }
 
         await cart.save();
@@ -148,3 +159,22 @@ router.put('/:id', async (req, res) => {
 });
 
 export default router;
+
+// Código de ejemplo para el cliente (no debe incluirse en el archivo del servidor)
+// const cartId = '688e5f62284765a000a12443';
+// const productId = '64fabc123456def78901234'; // Un string, no un número
+// const quantity = 2;
+
+// fetch('/api/carts/688e5f62284765a000a12443/products', {
+//   method: 'POST',
+//   headers: {
+//     'Content-Type': 'application/json'
+//   },
+//   body: JSON.stringify({
+//     productId: "64fabc123456def78901234",
+//     quantity: 1
+//   })
+// })
+// .then(res => res.json())
+// .then(data => console.log(data))
+// .catch(err => console.error(err));
