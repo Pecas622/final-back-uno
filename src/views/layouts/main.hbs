@@ -1,16 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
+    <title>Mi Tienda</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <link rel="stylesheet" href="/css/style.css">
 </head>
 <body>
-    <nav>
-        <a href="/">inicio</a>
-        <a href="/">Carts</a>
-        {{!-- <a href="/">inicio</a> --}}
-    </nav>
-    {{{ body }}}
+    <header>
+        <h1>Mi Tienda</h1>
+        <nav>
+            <a href="/">Inicio</a>
+            <a href="/cart/{{cartId}}">Carts</a>
+            <a href="/products">Productos</a>
+        </nav>
+    </header>
+
+    {{{body}}}
+
+    <footer>
+        <p>&copy; 2025 Tradición Mate</p>
+    </footer>
 </body>
 </html>

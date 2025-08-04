@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8" />
     <title>Productos en tiempo real</title>
-    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/styles.css" />
 </head>
+
 <body>
     <h1>Bienvenido a la página de productos</h1>
 
     <h2>Ordenar productos</h2>
     <form id="filterForm">
-        <select name="sort">
+        <select name="sort" id="sortSelect">
             <option value="">Ordenar por precio</option>
             <option value="asc">Precio Ascendente</option>
             <option value="desc">Precio Descendente</option>
@@ -20,104 +22,112 @@
 
     <h2>Agregar Producto</h2>
     <form id="addProductForm">
-        <input type="text" name="title" placeholder="Nombre del producto" required>
-        <input type="number" name="price" placeholder="Precio" required>
-        <input type="text" name="description" placeholder="Descripción" required>
-        <input type="number" name="stock" placeholder="Stock" required>
-        <input type="text" name="category" placeholder="Categoría" required>
+        <input type="text" name="title" placeholder="Nombre del producto" required />
+        <input type="number" name="price" placeholder="Precio" min="0" step="0.01" required />
+        <input type="text" name="description" placeholder="Descripción" required />
+        <input type="number" name="stock" placeholder="Stock" min="0" required />
+        <input type="text" name="category" placeholder="Categoría" required />
         <button type="submit">Agregar</button>
     </form>
 
     <h2>Lista de productos</h2>
     <ul id="productList">
-        <!-- Los productos se cargarán aquí dinámicamente -->
+        <!-- Productos cargados dinámicamente aquí -->
     </ul>
 
-    <div>
-        <center>
-            <button id="prevPageBtn" style="display: none;">Anterior</button>
-            <label id="pageLabel">Página 1</label>
-            <button id="nextPageBtn" style="display: none;">Siguiente</button>
-        </center>
+    <div style="text-align:center; margin-top: 1rem;">
+        <button id="prevPageBtn" style="display: none;">⬅ Anterior</button>
+        <span id="pageLabel">Página 1</span>
+        <button id="nextPageBtn" style="display: none;">Siguiente ➡</button>
     </div>
 
     <script>
-        // Variables para mantener el estado actual de filtros y página
         let currentFilters = { page: 1, sort: '' };
 
         async function fetchProducts(filters = {}) {
-            // Actualizar los filtros actuales
             currentFilters = { ...currentFilters, ...filters };
 
             try {
                 const queryParams = new URLSearchParams(currentFilters).toString();
                 const response = await fetch(`/api/products?${queryParams}`);
+
                 if (!response.ok) throw new Error('Error al obtener productos');
 
                 const data = await response.json();
-                console.log('Datos recibidos de la API:', data); // <-- LOG GENERAL
-
                 const products = data.payload || [];
-                products.forEach(product => console.log(product)); // <-- LOG POR PRODUCTO
 
                 const productList = document.getElementById('productList');
                 productList.innerHTML = '';
 
                 products.forEach(product => addProductToList(product));
 
-                document.getElementById('pageLabel').innerText = `Página ${data.page}`;
-                document.getElementById('prevPageBtn').style.display = data.hasPrevPage ? 'inline' : 'none';
-                document.getElementById('nextPageBtn').style.display = data.hasNextPage ? 'inline' : 'none';
+                document.getElementById('pageLabel').textContent = `Página ${data.page || currentFilters.page}`;
+                document.getElementById('prevPageBtn').style.display = data.hasPrevPage ? 'inline-block' : 'none';
+                document.getElementById('nextPageBtn').style.display = data.hasNextPage ? 'inline-block' : 'none';
             } catch (error) {
                 console.error('Error:', error);
                 alert('❌ No se pudieron cargar los productos');
             }
         }
 
-        // Función para agregar un nuevo producto
+        function addProductToList(product) {
+            const productList = document.getElementById('productList');
+            const newProductItem = document.createElement('li');
+            newProductItem.setAttribute('data-id', product._id);
+
+            newProductItem.innerHTML = `
+                <strong>Producto:</strong> ${product.title || product.nombre || 'Sin nombre'}<br />
+                <strong>Precio:</strong> $${product.price ?? product.precio ?? '0'}<br />
+                <button class="deleteButton">Eliminar</button>
+                <hr />
+            `;
+            productList.appendChild(newProductItem);
+        }
+
         document.getElementById('addProductForm').addEventListener('submit', async (event) => {
             event.preventDefault();
+
             const formData = new FormData(event.target);
             const productData = Object.fromEntries(formData.entries());
 
+            // Asegurar tipos numéricos
             productData.price = parseFloat(productData.price);
-            productData.stock = parseInt(productData.stock);
+            productData.stock = parseInt(productData.stock, 10);
 
             try {
                 const response = await fetch('/api/products', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(productData)
+                    body: JSON.stringify(productData),
                 });
 
                 const responseData = await response.json();
 
                 if (response.ok) {
                     alert('✅ Producto agregado exitosamente');
-                    // Recargar productos desde la página actual con filtros
-                    fetchProducts({ page: 1 }); // opcional: podés decidir qué hacer con la página
+                    fetchProducts({ page: 1 }); // refrescar lista en la página 1
+                    event.target.reset();
                 } else {
-                    alert(`❌ Error al agregar el producto: ${responseData.message}`);
+                    alert(`❌ Error al agregar el producto: ${responseData.message || 'Desconocido'}`);
                 }
             } catch (error) {
                 console.error('Error:', error);
                 alert('❌ Hubo un problema al enviar el producto');
             }
-
-            event.target.reset();
         });
 
-        // Función para eliminar un producto
         document.getElementById('productList').addEventListener('click', async (event) => {
-            if (event.target && event.target.classList.contains('deleteButton')) {
+            if (event.target.classList.contains('deleteButton')) {
                 const productId = event.target.closest('li').getAttribute('data-id');
+                if (!productId) return;
+
+                if (!confirm('¿Querés eliminar este producto?')) return;
 
                 try {
                     const response = await fetch(`/api/products/${productId}`, { method: 'DELETE' });
 
                     if (response.ok) {
                         alert('✅ Producto eliminado exitosamente');
-                        // Opcional: eliminar el elemento del DOM sin recargar toda la lista
                         event.target.closest('li').remove();
                     } else {
                         alert('❌ Error al eliminar el producto');
@@ -129,33 +139,12 @@
             }
         });
 
-        function addProductToList(product) {
-            console.log(product); // Verifica las propiedades reales
-
-            const productList = document.getElementById('productList');
-            const newProductItem = document.createElement('li');
-            newProductItem.setAttribute('data-id', product._id);
-
-            newProductItem.innerHTML = `
-                <strong>Producto: </strong>${product.title || product.nombre || product.name || 'Sin nombre'}
-                <strong> Precio: </strong>$${product.price || product.precio || product.cost || '0'}
-                <button class="deleteButton">Eliminar</button>
-                <hr>
-            `;
-            productList.appendChild(newProductItem);
-        }
-
-        // Manejo del formulario de ordenamiento
         document.getElementById('filterForm').addEventListener('submit', (event) => {
             event.preventDefault();
-            const formData = new FormData(event.target);
-            const filters = Object.fromEntries(formData.entries());
-
-            // Al ordenar, siempre empezar desde página 1
-            fetchProducts({ page: 1, sort: filters.sort || '' });
+            const sortValue = document.getElementById('sortSelect').value;
+            fetchProducts({ page: 1, sort: sortValue });
         });
 
-        // Botones de paginación
         document.getElementById('prevPageBtn').addEventListener('click', () => {
             if (currentFilters.page > 1) {
                 fetchProducts({ page: currentFilters.page - 1 });
@@ -166,10 +155,11 @@
             fetchProducts({ page: currentFilters.page + 1 });
         });
 
-        // Cargar productos inicialmente
+        // Carga inicial
         document.addEventListener('DOMContentLoaded', () => {
             fetchProducts();
         });
     </script>
 </body>
+
 </html>

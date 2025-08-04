@@ -1,7 +1,8 @@
 import express from 'express';
 import handlebars from 'express-handlebars';
 import routerApp from './routes/index.js';
-import viewsRouter from '../src/routes/views.router.js      ';
+import viewsRouter from './routes/views.router.js';
+import cartsApiRouter from './routes/api/carts.routes.js'; // <-- Agrega esta línea
 import { connectDB } from './config/index.js';
 import 'dotenv/config';
 
@@ -40,6 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // 🔹 Rutas principales (API REST)
 app.use(routerApp);      // rutas API (ej: /api/products, /api/carts...)
+app.use('/api/carts', cartsApiRouter); // <-- Agrega esta línea
 
 // 🔹 Rutas para vistas (páginas renderizadas)
 app.use('/', viewsRouter); // rutas para vistas con render

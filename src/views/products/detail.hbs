@@ -1,0 +1,14 @@
+<h2>Detalle del Producto</h2>
+
+<div class="product-detail" style="border: 1px solid #ccc; padding: 15px;">
+    <h3>{{product.title}}</h3>
+    <p>Categoría: {{product.category}}</p>
+    <p>Precio: ${{product.price}}</p>
+    <p>Stock disponible: {{product.stock}}</p>
+
+    <button onclick="addToCart('{{product._id}}')">Agregar al carrito</button>
+</div>
+
+<a href="/products">← Volver al listado</a>
+
+<script src="/js/cart.js"></script>
