@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Control de Préstamos</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+
+<body>
+
+<!-- LOGIN (simple y limpio) -->
+<div id="login">
+    <h2>🔐 Acceso</h2>
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="btnLogin">Entrar</button>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+
+<header class="header">
+    <h1>💰 Libreta de Préstamos</h1>
+    <button id="btnLogout">Salir</button>
+</header>
+
+<section class="top-bar">
+    <input type="text" id="buscador" placeholder="Buscar cliente...">
+</section>
+
+<section class="stats" id="stats"></section>
+
+<section class="form-section">
+    <div class="form-grid">
+        <input type="text" id="nombre" placeholder="Nombre">
+        <input type="number" id="monto" placeholder="Monto">
+        <input type="number" id="interes" placeholder="Interés %">
+
+        <select id="plan">
+            <option>Diario</option>
+            <option>Semanal</option>
+            <option>Quincenal</option>
+            <option>Mensual</option>
+        </select>
+
+        <button id="btnAgregar">Agregar</button>
+    </div>
+</section>
+
+<section id="clientes" class="clientes-grid"></section>
+
+</div>
+
+<script type="module" src="app.js"></script>
+</body>
+
+</html>
